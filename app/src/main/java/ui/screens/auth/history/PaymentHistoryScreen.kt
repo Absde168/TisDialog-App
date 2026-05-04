@@ -1,7 +1,6 @@
 package ui.screens.auth.history
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -18,7 +16,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import data.model.PaymentHistory
+import ui.components.DetailTopBar
+import ui.theme.BackgroundLight
+import ui.theme.ErrorRed
 import ui.theme.Primary
+import ui.theme.SuccessGreen
 import ui.theme.TextSecondary
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -30,39 +32,24 @@ fun PaymentHistoryScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // === ВЕРХНЯЯ ПАНЕЛЬ ===
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "← Назад",
-                fontSize = 14.sp,
-                color = Primary,
-                modifier = Modifier.clickable { onBackClick() }
-            )
-            Text(
-                text = "ДИАЛОГ",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Primary
-            )
-            Spacer(modifier = Modifier.width(48.dp))
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 16.dp)
+    ) {
+        // ── Шапка ─────────────────────────────────────────────────────────────
+        DetailTopBar(onBackClick = onBackClick)
+
+        Spacer(Modifier.height(4.dp))
 
         Text(
             text = "История платежей",
-            fontSize = 24.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(vertical = 8.dp)
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         when {
             uiState.isLoading -> {
@@ -76,23 +63,22 @@ fun PaymentHistoryScreen(
 
             uiState.error != null -> {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
+                    modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = uiState.error ?: "",
-                        color = MaterialTheme.colorScheme.error,
+                        color = ErrorRed,
                         fontSize = 14.sp
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(Modifier.height(16.dp))
                     Button(
                         onClick = { viewModel.loadPayments() },
+                        shape = RoundedCornerShape(22.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Primary)
                     ) {
-                        Text("Повторить")
+                        Text("Повторить", fontSize = 14.sp)
                     }
                 }
             }
@@ -102,47 +88,39 @@ fun PaymentHistoryScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Нет истории платежей", color = TextSecondary, fontSize = 16.sp)
+                    Text(
+                        text = "Нет истории платежей",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 16.sp
+                    )
                 }
             }
 
             else -> {
                 LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
                     items(uiState.payments, key = { it.id }) { payment ->
                         PaymentHistoryCard(payment)
                     }
-                    item { Spacer(modifier = Modifier.height(8.dp)) }
                 }
             }
         }
-
-        // === НИЖНЯЯ НАВИГАЦИЯ ===
-        BottomNavigationHistory(
-            onMainClick = onBackClick,
-            onTariffsClick = { },
-            onServicesClick = { }
-        )
     }
 }
 
 @Composable
 private fun PaymentHistoryCard(payment: PaymentHistory) {
     val isPositive = payment.amount >= 0
-    val amountStr = if (isPositive) "+%.2f руб.".format(payment.amount)
-    else "%.2f руб.".format(payment.amount)
-    val statusColor = if (payment.status == "Success") Color(0xFF2E7D32) else Color.Red
+    val isSuccess = payment.status.equals("Success", ignoreCase = true)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
             modifier = Modifier
@@ -155,86 +133,36 @@ private fun PaymentHistoryCard(payment: PaymentHistory) {
                 Text(
                     text = formatDate(payment.paymentDate),
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.SemiBold,
                     color = Primary
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(Modifier.height(3.dp))
                 Text(
                     text = payment.paymentMethod,
-                    fontSize = 14.sp,
-                    color = TextSecondary
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(Modifier.height(3.dp))
                 Text(
-                    text = if (payment.status == "Success") "Успешно" else payment.status,
+                    text = if (isSuccess) "Успешно" else payment.status,
                     fontSize = 12.sp,
-                    color = statusColor,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = if (isSuccess) SuccessGreen else ErrorRed
                 )
             }
 
             Text(
-                text = amountStr,
+                text = if (isPositive) "+%.2f ₽".format(payment.amount)
+                       else "%.2f ₽".format(payment.amount),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isPositive) Color(0xFF2E7D32) else Color.Red
+                color = if (isPositive) SuccessGreen else ErrorRed
             )
         }
     }
 }
 
-private fun formatDate(isoDate: String): String {
-    return try {
-        val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-        val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-        formatter.format(parser.parse(isoDate) ?: return isoDate)
-    } catch (e: Exception) {
-        isoDate.take(10)
-    }
-}
-
-@Composable
-private fun BottomNavigationHistory(
-    onMainClick: () -> Unit,
-    onTariffsClick: () -> Unit,
-    onServicesClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .clip(RoundedCornerShape(28.dp))
-            .background(Primary)
-            .padding(horizontal = 4.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .clickable { onMainClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Главная", fontSize = 14.sp, color = Color.White, fontWeight = FontWeight.Medium)
-        }
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .clickable { onTariffsClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Тарифы", fontSize = 14.sp, color = Color.White, fontWeight = FontWeight.Medium)
-        }
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .clickable { onServicesClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Услуги", fontSize = 14.sp, color = Color.White, fontWeight = FontWeight.Medium)
-        }
-    }
-}
+private fun formatDate(isoDate: String): String = try {
+    val p = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+    SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(p.parse(isoDate)!!)
+} catch (e: Exception) { isoDate.take(10) }

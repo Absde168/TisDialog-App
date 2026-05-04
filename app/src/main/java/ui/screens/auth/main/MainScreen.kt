@@ -65,7 +65,7 @@ fun MainScreen(
                 text = "Подключение: Активно",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
@@ -117,7 +117,7 @@ private fun BalanceCard(balance: Double, onTopUpClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
@@ -128,13 +128,13 @@ private fun BalanceCard(balance: Double, onTopUpClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text(text = "Баланс", fontSize = 13.sp, color = TextSecondary)
+                Text(text = "Баланс", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = "%.2f ₽".format(balance),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (balance >= 0) Color.Black else ErrorRed
+                    color = if (balance >= 0) MaterialTheme.colorScheme.onSurface else ErrorRed
                 )
             }
             Button(
@@ -155,20 +155,20 @@ private fun InfoCard(uiState: MainUiState) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = "Скорость подключения:",
                 fontSize = 13.sp,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             InfoRow("Загрузка:", "15 Мбит/с")
             InfoRow("Отдача:", "5 Мбит/с")
             Spacer(Modifier.height(8.dp))
-            HorizontalDivider(color = Color(0xFFEEEEEE))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             Spacer(Modifier.height(8.dp))
             InfoRow("Трафик:", uiState.dataUsedFormatted)
             InfoRow("Лицевой счет:", uiState.user?.login ?: "—")
@@ -184,8 +184,8 @@ private fun InfoRow(label: String, value: String) {
             .padding(vertical = 3.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, fontSize = 13.sp, color = TextSecondary, modifier = Modifier.weight(1f))
-        Text(text = value, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+        Text(text = label, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+        Text(text = value, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -203,7 +203,7 @@ private fun PaymentHistoryCard(
             .fillMaxWidth()
             .clickable { onToggle() },
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -227,14 +227,14 @@ private fun PaymentHistoryCard(
 
             if (expanded) {
                 Spacer(Modifier.height(12.dp))
-                HorizontalDivider(color = Color(0xFFEEEEEE))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 Spacer(Modifier.height(12.dp))
 
                 if (payments.isEmpty()) {
                     Text(
                         text = "Нет данных",
                         fontSize = 13.sp,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
                 } else {
@@ -269,7 +269,7 @@ private fun PaymentRow(p: PaymentHistory) {
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(formatDate(p.paymentDate), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Primary)
-            Text(p.paymentMethod, fontSize = 12.sp, color = TextSecondary)
+            Text(p.paymentMethod, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Text(
             text = if (isPositive) "+%.2f ₽".format(p.amount) else "%.2f ₽".format(p.amount),

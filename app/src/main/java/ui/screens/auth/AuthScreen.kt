@@ -53,7 +53,7 @@ fun AuthScreen(
             text = "Авторизация",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(bottom = 40.dp)
         )
 
@@ -144,7 +144,7 @@ fun AuthScreen(
             Text(
                 text = "Забыли пароль?",
                 fontSize = 14.sp,
-                color = TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -167,7 +167,7 @@ private fun AuthTextField(
         Text(
             text = label,
             fontSize = 12.sp,
-            color = if (isError) ErrorRed else TextSecondary,
+            color = if (isError) ErrorRed else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 4.dp)
         )
         TextField(
@@ -189,8 +189,8 @@ private fun AuthTextField(
                 focusedIndicatorColor    = Primary,
                 unfocusedIndicatorColor  = TextHint,
                 errorIndicatorColor      = ErrorRed,
-                focusedTextColor         = Color.Black,
-                unfocusedTextColor       = Color.Black
+                focusedTextColor         = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor       = MaterialTheme.colorScheme.onSurface
             )
         )
         if (errorText != null) {

@@ -12,7 +12,6 @@ import ui.screens.auth.main.MainScreen
 import ui.screens.auth.profile.ContactsScreen
 import ui.screens.auth.profile.DocumentsScreen
 import ui.screens.auth.profile.HelpFAQScreen
-import ui.screens.auth.profile.LogoutConfirmDialog
 import ui.screens.auth.profile.NotificationSettingsScreen
 import ui.screens.auth.profile.ProfileScreen
 import ui.screens.auth.services.ServicesScreen
@@ -55,28 +54,30 @@ fun AppNavigation() {
 
         composable("main") {
             MainScreen(
-                onProfileClick = { navController.navigate("profile") },
-                onChatClick = { navController.navigate("chat") },
-                onHistoryClick = { navController.navigate("history") },
-                onTariffsClick = { navController.navigate("tariffs") },
+                onProfileClick  = { navController.navigate("profile") },
+                onChatClick     = { navController.navigate("chat") },
+                onHistoryClick  = { navController.navigate("history") },
+                onTariffsClick  = { navController.navigate("tariffs") },
                 onServicesClick = { navController.navigate("services") },
-                onTopUpClick = { navController.navigate("topup") }
+                onTopUpClick    = { navController.navigate("topup") }
             )
         }
 
         composable("profile") {
             ProfileScreen(
-                onBackClick = { navController.popBackStack() },
-                onContactsClick = { navController.navigate("contacts") },
-                onSupportClick = { navController.navigate("chat") },
-                onDocumentsClick = { navController.navigate("documents") },
+                onBackClick          = { navController.popBackStack() },
+                onContactsClick      = { navController.navigate("contacts") },
+                onSupportClick       = { navController.navigate("chat") },
+                onDocumentsClick     = { navController.navigate("documents") },
                 onNotificationsClick = { navController.navigate("notifications") },
-                onHelpClick = { navController.navigate("help") },
-                onLogoutClick = {
+                onHelpClick          = { navController.navigate("help") },
+                onLogoutClick        = {
                     navController.navigate("auth") {
                         popUpTo(0) { inclusive = true }
                     }
-                }
+                },
+                onTariffsClick  = { navController.navigate("tariffs") },
+                onServicesClick = { navController.navigate("services") }
             )
         }
 
@@ -89,7 +90,10 @@ fun AppNavigation() {
         }
 
         composable("help") {
-            HelpFAQScreen(onBackClick = { navController.popBackStack() })
+            HelpFAQScreen(
+                onBackClick    = { navController.popBackStack() },
+                onSupportClick = { navController.navigate("chat") }
+            )
         }
 
         composable("notifications") {
@@ -98,14 +102,16 @@ fun AppNavigation() {
 
         composable("tariffs") {
             TariffsScreen(
-                onBackClick = {
-                    navController.navigate("main") {
-                        popUpTo("tariffs") { inclusive = true }
-                    }
-                },
+                onBackClick = { navController.popBackStack() },
                 onTariffClick = { tariffName ->
                     navController.navigate("tariff_detail/$tariffName")
-                }
+                },
+                onMainClick = {
+                    navController.navigate("main") {
+                        popUpTo("main") { inclusive = false }
+                    }
+                },
+                onServicesClick = { navController.navigate("services") }
             )
         }
 
@@ -116,7 +122,7 @@ fun AppNavigation() {
                 onBackClick = { navController.popBackStack() },
                 onConnectClick = {
                     navController.navigate("main") {
-                        popUpTo("main") { inclusive = true }
+                        popUpTo("main") { inclusive = false }
                     }
                 }
             )
@@ -124,11 +130,13 @@ fun AppNavigation() {
 
         composable("services") {
             ServicesScreen(
-                onBackClick = {
+                onBackClick = { navController.popBackStack() },
+                onMainClick = {
                     navController.navigate("main") {
-                        popUpTo("services") { inclusive = true }
+                        popUpTo("main") { inclusive = false }
                     }
-                }
+                },
+                onTariffsClick = { navController.navigate("tariffs") }
             )
         }
 

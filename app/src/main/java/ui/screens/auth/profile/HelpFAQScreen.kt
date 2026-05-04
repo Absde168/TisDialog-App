@@ -1,5 +1,6 @@
 package ui.screens.auth.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,6 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ui.components.DetailTopBar
+import ui.theme.BackgroundLight
 import ui.theme.Primary
 import ui.theme.TextSecondary
 
@@ -23,7 +26,8 @@ data class FAQItem(
 
 @Composable
 fun HelpFAQScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onSupportClick: () -> Unit = {}
 ) {
     val faqItems = listOf(
         FAQItem(
@@ -53,61 +57,44 @@ fun HelpFAQScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
     ) {
-        // === ВЕРХНЯЯ ПАНЕЛЬ ===
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "← Назад",
-                fontSize = 14.sp,
-                color = Primary,
-                modifier = Modifier.clickable { onBackClick() }
-            )
+        // ── Шапка ─────────────────────────────────────────────────────────────
+        DetailTopBar(onBackClick = onBackClick, title = "Помощь / FAQ")
 
-            Text(
-                text = "Помощь / FAQ",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
+        Spacer(Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.width(32.dp))
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // === СПИСОК ВОПРОСОВ ===
+        // ── Список вопросов ───────────────────────────────────────────────────
         faqItems.forEachIndexed { index, item ->
             FAQCard(
                 item = item,
                 isExpanded = expandedIndex == index,
                 onExpand = { expandedIndex = if (expandedIndex == index) -1 else index }
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(Modifier.height(10.dp))
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(16.dp))
 
-        // === КНОПКА В ПОДДЕРЖКУ ===
+        // ── Кнопка в поддержку ────────────────────────────────────────────────
         Button(
-            onClick = { /* TODO: Открыть чат */ },
+            onClick = onSupportClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(28.dp),
+                .height(52.dp),
+            shape = RoundedCornerShape(26.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Primary)
         ) {
-            Text("Написать в поддержку", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text(
+                text = "Написать в поддержку",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
     }
 }
 
@@ -122,8 +109,8 @@ private fun FAQCard(
             .fillMaxWidth()
             .clickable { onExpand() },
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(1.dp)
     ) {
         Column(
             modifier = Modifier
@@ -137,26 +124,26 @@ private fun FAQCard(
             ) {
                 Text(
                     text = item.question,
-                    fontSize = 16.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
                     text = if (isExpanded) "▼" else "▶",
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     color = Primary
                 )
             }
 
             if (isExpanded) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Divider()
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                Spacer(Modifier.height(12.dp))
                 Text(
                     text = item.answer,
                     fontSize = 14.sp,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 20.sp
                 )
             }

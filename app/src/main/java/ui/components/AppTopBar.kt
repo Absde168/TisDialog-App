@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,6 +32,7 @@ fun MainTopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .padding(horizontal = 4.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -65,6 +67,7 @@ fun DetailTopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .padding(horizontal = 4.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -106,6 +109,7 @@ fun AppBottomNav(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .navigationBarsPadding()
             .height(56.dp)
             .clip(RoundedCornerShape(28.dp))
             .background(Primary),
@@ -121,7 +125,7 @@ fun AppBottomNav(
                             Modifier
                                 .padding(4.dp)
                                 .clip(RoundedCornerShape(24.dp))
-                                .background(Color.White)
+                                .background(MaterialTheme.colorScheme.background)
                         else
                             Modifier.clickable { clicks[i]() }
                     )

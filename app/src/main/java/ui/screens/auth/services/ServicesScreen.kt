@@ -1,7 +1,6 @@
 package ui.screens.auth.services
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,122 +9,105 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ui.components.AppBottomNav
+import ui.components.DetailTopBar
+import ui.theme.BackgroundLight
 import ui.theme.Primary
-import ui.theme.TextSecondary
 
 @Composable
 fun ServicesScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onMainClick: () -> Unit = onBackClick,
+    onTariffsClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
     ) {
-        // === ВЕРХНЯЯ ПАНЕЛЬ ===
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Кнопка назад
-            Text(
-                text = "← Назад",
-                fontSize = 14.sp,
-                color = Primary,
-                modifier = Modifier.clickable { onBackClick() }
-            )
+        // ── Шапка ─────────────────────────────────────────────────────────────
+        DetailTopBar(onBackClick = onBackClick)
 
-            // Логотип
-            Text(
-                text = "ДИАЛОГ",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Primary
-            )
+        Spacer(Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.width(32.dp))
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Заголовок
         Text(
             text = "Дополнительные услуги",
-            fontSize = 24.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(vertical = 8.dp)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(8.dp))
 
-        // === СПИСОК УСЛУГ ===
-        ServiceItem(
+        // ── Карточки услуг (Figma: тёмно-синий фон) ──────────────────────────
+        ServiceCard(
             name = "VPN",
             description = "Защита вашего интернета",
-            isActive = false
+            isActive = false,
+            onConnect = {}
         )
+        Spacer(Modifier.height(12.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        ServiceItem(
+        ServiceCard(
             name = "Антивирус",
-            description = "Защита от вирусов",
-            isActive = false
+            description = "Защита от вирусов и угроз",
+            isActive = false,
+            onConnect = {}
         )
+        Spacer(Modifier.height(12.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        ServiceItem(
+        ServiceCard(
             name = "Родительский контроль",
             description = "Безопасность детей в сети",
-            isActive = true
+            isActive = true,
+            onConnect = {}
         )
+        Spacer(Modifier.height(12.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        ServiceItem(
+        ServiceCard(
             name = "Статический IP",
             description = "Постоянный адрес в сети",
-            isActive = false
+            isActive = false,
+            onConnect = {}
         )
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.height(12.dp))
 
-        // === НИЖНЯЯ НАВИГАЦИЯ ===
-        BottomNavigationServices(
-            onMainClick = onBackClick,
-            onTariffsClick = { },
-            onServicesClick = { }
+        // ── Нижняя навигация ─────────────────────────────────────────────────
+        AppBottomNav(
+            activeTab = 2,
+            onMainClick = onMainClick,
+            onTariffsClick = onTariffsClick,
+            onServicesClick = {}
         )
+        Spacer(Modifier.height(16.dp))
     }
 }
 
 @Composable
-private fun ServiceItem(
+private fun ServiceCard(
     name: String,
     description: String,
-    isActive: Boolean
+    isActive: Boolean,
+    onConnect: () -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = Primary),
+        elevation = CardDefaults.cardElevation(0.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -133,82 +115,54 @@ private fun ServiceItem(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(Modifier.height(4.dp))
                 Text(
                     text = description,
-                    fontSize = 14.sp,
-                    color = TextSecondary
+                    fontSize = 13.sp,
+                    color = Color.White.copy(alpha = 0.8f)
                 )
             }
 
-            Switch(
-                checked = isActive,
-                onCheckedChange = { /* TODO */ },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Primary,
-                    checkedTrackColor = Primary.copy(alpha = 0.5f)
-                )
-            )
-        }
-    }
-}
+            Spacer(Modifier.width(12.dp))
 
-@Composable
-private fun BottomNavigationServices(
-    onMainClick: () -> Unit,
-    onTariffsClick: () -> Unit,
-    onServicesClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .clip(RoundedCornerShape(28.dp))
-            .background(Primary),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Главная
-        Text(
-            text = "Главная",
-            fontSize = 14.sp,
-            color = Color.White,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier
-                .weight(1f)
-                .clickable { onMainClick() }
-        )
-
-        // Тарифы
-        Text(
-            text = "Тарифы",
-            fontSize = 14.sp,
-            color = Color.White,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier
-                .weight(1f)
-                .clickable { onTariffsClick() }
-        )
-
-        // Услуги (активная)
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(28.dp))
-                .background(Color.White),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Услуги",
-                fontSize = 14.sp,
-                color = Primary,
-                fontWeight = FontWeight.Medium
-            )
+            if (isActive) {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            Color.White.copy(alpha = 0.25f),
+                            RoundedCornerShape(20.dp)
+                        )
+                        .padding(horizontal = 14.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = "Активно",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White
+                    )
+                }
+            } else {
+                Button(
+                    onClick = onConnect,
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Primary
+                    ),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Text(
+                        text = "Подключить",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package ui.screens.auth.balance
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ui.components.DetailTopBar
+import ui.theme.BackgroundLight
+import ui.theme.ErrorRed
 import ui.theme.Primary
+import ui.theme.TextHint
+import ui.theme.TextSecondary
 
 @Composable
 fun TopUpBalanceScreen(
@@ -26,7 +32,6 @@ fun TopUpBalanceScreen(
     var amount by remember { mutableStateOf("") }
     var selectedMethod by remember { mutableStateOf("card") }
 
-    // Navigate back after successful payment
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
             viewModel.resetSuccess()
@@ -37,92 +42,75 @@ fun TopUpBalanceScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 16.dp)
     ) {
-        // === ВЕРХНЯЯ ПАНЕЛЬ ===
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "← Назад",
-                fontSize = 14.sp,
-                color = Primary,
-                modifier = Modifier.clickable { onBackClick() }
-            )
-            Text(
-                text = "Пополнить баланс",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.width(48.dp))
-        }
+        // ── Шапка ─────────────────────────────────────────────────────────────
+        DetailTopBar(onBackClick = onBackClick, title = "Пополнить баланс")
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(Modifier.height(24.dp))
 
-        // === ОШИБКА ===
+        // ── Ошибка ────────────────────────────────────────────────────────────
         uiState.error?.let { error ->
-            Card(
+            Text(
+                text = error,
+                color = ErrorRed,
+                fontSize = 13.sp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = error,
-                    modifier = Modifier.padding(12.dp),
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                    fontSize = 14.sp
-                )
-            }
+                    .padding(bottom = 12.dp)
+            )
         }
 
-        // === ПОЛЕ СУММЫ ===
+        // ── Поле суммы ────────────────────────────────────────────────────────
+        Text(
+            text = "Сумма пополнения",
+            fontSize = 13.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 6.dp)
+        )
+
         OutlinedTextField(
             value = amount,
             onValueChange = {
                 amount = it
                 if (uiState.error != null) viewModel.clearError()
             },
-            label = { Text("Сумма, руб.") },
             modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text("0.00", fontSize = 14.sp, color = TextHint) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Primary,
-                unfocusedBorderColor = Color.Gray
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                errorBorderColor = ErrorRed,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
             ),
-            prefix = { Text("₽", color = Primary) },
+            prefix = { Text("₽ ", color = Primary, fontWeight = FontWeight.Medium) },
             isError = uiState.error != null,
             enabled = !uiState.isLoading,
             singleLine = true
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
 
-        // === СПОСОБЫ ОПЛАТЫ ===
+        // ── Способ оплаты ─────────────────────────────────────────────────────
         Text(
             text = "Способ оплаты",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.Black
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(bottom = 12.dp)
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             PaymentMethodButton(
                 text = "Карта",
+                icon = "💳",
                 selected = selectedMethod == "card",
                 enabled = !uiState.isLoading,
                 modifier = Modifier.weight(1f),
@@ -130,6 +118,7 @@ fun TopUpBalanceScreen(
             )
             PaymentMethodButton(
                 text = "СБП",
+                icon = "⚡",
                 selected = selectedMethod == "sbp",
                 enabled = !uiState.isLoading,
                 modifier = Modifier.weight(1f),
@@ -137,6 +126,7 @@ fun TopUpBalanceScreen(
             )
             PaymentMethodButton(
                 text = "Счёт",
+                icon = "🏦",
                 selected = selectedMethod == "account",
                 enabled = !uiState.isLoading,
                 modifier = Modifier.weight(1f),
@@ -144,36 +134,44 @@ fun TopUpBalanceScreen(
             )
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(Modifier.weight(1f))
 
-        // === КНОПКА ОПЛАТИТЬ ===
+        // ── Кнопка оплаты ─────────────────────────────────────────────────────
         Button(
             onClick = { viewModel.pay(amount, selectedMethod) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(28.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                .height(52.dp),
+            shape = RoundedCornerShape(26.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Primary,
+                disabledContainerColor = Primary.copy(alpha = 0.5f)
+            ),
             enabled = amount.isNotBlank() && !uiState.isLoading
         ) {
             if (uiState.isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(22.dp),
                     color = Color.White,
                     strokeWidth = 2.dp
                 )
             } else {
-                Text("Оплатить", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text(
+                    text = "Оплатить",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
     }
 }
 
 @Composable
 private fun PaymentMethodButton(
     text: String,
+    icon: String,
     selected: Boolean,
     enabled: Boolean,
     modifier: Modifier = Modifier,
@@ -181,20 +179,28 @@ private fun PaymentMethodButton(
 ) {
     Card(
         modifier = modifier
-            .height(48.dp)
+            .height(64.dp)
             .clickable(enabled = enabled) { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (selected) Primary else Color.White
+            containerColor = if (selected) Primary else MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(if (selected) 0.dp else 1.dp),
+        border = if (!selected) androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                 else null
     ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = icon, fontSize = 18.sp)
+            Spacer(Modifier.height(2.dp))
             Text(
                 text = text,
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
-                color = if (selected) Color.White else Color.Black
+                color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface
             )
         }
     }

@@ -7,6 +7,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -29,14 +30,22 @@ private val LightColorScheme = lightColorScheme(
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary          = Primary,
-    onPrimary        = WhiteText,
-    background       = DarkBg,
-    onBackground     = WhiteText,
-    surface          = DarkBg,
-    onSurface        = WhiteText,
-    error            = ErrorRed,
-    onError          = WhiteText
+    primary             = Primary,
+    onPrimary           = WhiteText,
+    primaryContainer    = Secondary,
+    onPrimaryContainer  = WhiteText,
+    secondary           = Secondary,
+    onSecondary         = WhiteText,
+    background          = DarkBg,
+    onBackground        = TextOnDark,
+    surface             = DarkSurface,
+    onSurface           = TextOnDark,
+    surfaceVariant      = DarkSurfaceVariant,
+    onSurfaceVariant    = TextSecondaryDark,
+    error               = ErrorRed,
+    onError             = WhiteText,
+    outline             = Color(0xFF555555),
+    outlineVariant      = Color(0xFF3A3A3A)
 )
 
 @Composable

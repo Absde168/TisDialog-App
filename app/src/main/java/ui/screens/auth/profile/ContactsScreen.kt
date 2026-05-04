@@ -1,6 +1,6 @@
 package ui.screens.auth.profile
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,9 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ui.components.DetailTopBar
+import ui.theme.BackgroundLight
+import ui.theme.ErrorRed
 import ui.theme.Primary
+import ui.theme.SuccessGreen
+import ui.theme.TextHint
+import ui.theme.TextSecondary
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContactsScreen(
     onBackClick: () -> Unit,
@@ -30,84 +35,54 @@ fun ContactsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
     ) {
-        // === ВЕРХНЯЯ ПАНЕЛЬ ===
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "← Назад",
-                fontSize = 14.sp,
-                color = Primary,
-                modifier = Modifier.clickable { onBackClick() }
-            )
-            Text(
-                text = "Мои контакты",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.width(48.dp))
-        }
+        // ── Шапка ─────────────────────────────────────────────────────────────
+        DetailTopBar(onBackClick = onBackClick, title = "Мои контакты")
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(16.dp))
 
         if (uiState.isLoading) {
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 60.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator(color = Primary)
             }
         } else {
-            // Ошибка загрузки / сохранения
+            // ── Ошибка ────────────────────────────────────────────────────────
             uiState.error?.let { error ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(
-                        text = error,
-                        modifier = Modifier.padding(12.dp),
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        fontSize = 14.sp
-                    )
-                }
+                Text(
+                    text = error,
+                    color = ErrorRed,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
             }
 
-            // Успешное сохранение
+            // ── Успех ─────────────────────────────────────────────────────────
             if (uiState.saveSuccess) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(
-                        text = "Данные успешно сохранены",
-                        modifier = Modifier.padding(12.dp),
-                        color = Color(0xFF2E7D32),
-                        fontSize = 14.sp
-                    )
-                }
+                Text(
+                    text = "✓  Данные успешно сохранены",
+                    color = SuccessGreen,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
             }
 
+            // ── Поля ──────────────────────────────────────────────────────────
             ContactField(
                 label = "Имя",
                 value = uiState.firstName,
                 onValueChange = viewModel::onFirstNameChange,
                 enabled = !uiState.isSaving
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
             ContactField(
                 label = "Фамилия",
@@ -115,7 +90,7 @@ fun ContactsScreen(
                 onValueChange = viewModel::onLastNameChange,
                 enabled = !uiState.isSaving
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
             ContactField(
                 label = "Телефон",
@@ -124,7 +99,7 @@ fun ContactsScreen(
                 keyboardType = KeyboardType.Phone,
                 enabled = !uiState.isSaving
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
             ContactField(
                 label = "Email",
@@ -135,34 +110,41 @@ fun ContactsScreen(
             )
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.height(24.dp))
 
+        // ── Кнопка сохранить ─────────────────────────────────────────────────
         Button(
             onClick = { viewModel.save() },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(28.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                .height(52.dp),
+            shape = RoundedCornerShape(26.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Primary,
+                disabledContainerColor = Primary.copy(alpha = 0.5f)
+            ),
             enabled = !uiState.isLoading && !uiState.isSaving
         ) {
             if (uiState.isSaving) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(22.dp),
                     color = Color.White,
                     strokeWidth = 2.dp
                 )
             } else {
-                Text("Сохранить", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text(
+                    text = "Сохранить",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ContactField(
     label: String,
@@ -171,18 +153,28 @@ private fun ContactField(
     keyboardType: KeyboardType = KeyboardType.Text,
     enabled: Boolean = true
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Primary,
-            unfocusedBorderColor = Color.Gray
-        ),
-        enabled = enabled,
-        singleLine = true
-    )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text(label, fontSize = 14.sp, color = TextHint) },
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+            ),
+            enabled = enabled,
+            singleLine = true
+        )
+    }
 }

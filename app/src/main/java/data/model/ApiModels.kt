@@ -5,8 +5,8 @@ import com.google.gson.annotations.SerializedName
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
 data class LoginRequest(
-    @SerializedName("login") val login: String,
-    @SerializedName("password") val password: String
+    @SerializedName("Login") val login: String,
+    @SerializedName("Password") val password: String
 )
 
 data class LoginResponse(

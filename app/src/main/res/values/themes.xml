@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Базовая тема для Compose + Material3 -->
+    <style name="Theme.TisDialogFirst" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- ✅ Минимальный набор для Compose -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">#FAFAFA</item>
+
+        <!-- ❌ УБЕРИ все цветные атрибуты типа colorPrimary - они для Material2/XML UI -->
+    </style>
+
+    <!-- Для тёмной темы (опционально) -->
+    <style name="Theme.TisDialogFirst.Dark" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">#060606</item>
+    </style>
+</resources>

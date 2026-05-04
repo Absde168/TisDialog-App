@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Screen padding -->
+    <dimen name="screen_padding">16dp</dimen>
+    <dimen name="screen_padding_horizontal">20dp</dimen>
+
+    <!-- Card -->
+    <dimen name="card_radius">12dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_padding">16dp</dimen>
+
+    <!-- Spacing -->
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">12dp</dimen>
+    <dimen name="spacing_lg">16dp</dimen>
+    <dimen name="spacing_xl">24dp</dimen>
+    <dimen name="spacing_xxl">32dp</dimen>
+
+    <!-- Button -->
+    <dimen name="button_height">52dp</dimen>
+    <dimen name="button_height_small">40dp</dimen>
+    <dimen name="button_radius">26dp</dimen>
+    <dimen name="button_radius_small">20dp</dimen>
+
+    <!-- Bottom nav -->
+    <dimen name="bottom_nav_height">56dp</dimen>
+    <dimen name="bottom_nav_radius">28dp</dimen>
+
+    <!-- Top bar -->
+    <dimen name="top_bar_icon_size">28dp</dimen>
+    <dimen name="top_bar_logo_size">22sp</dimen>
+
+    <!-- Text sizes -->
+    <dimen name="text_xs">11sp</dimen>
+    <dimen name="text_sm">12sp</dimen>
+    <dimen name="text_md">14sp</dimen>
+    <dimen name="text_lg">16sp</dimen>
+    <dimen name="text_xl">18sp</dimen>
+    <dimen name="text_title">20sp</dimen>
+    <dimen name="text_h2">22sp</dimen>
+    <dimen name="text_h1">24sp</dimen>
+    <dimen name="text_display">28sp</dimen>
+
+    <!-- Splash logo -->
+    <dimen name="splash_logo_size">180dp</dimen>
+
+    <!-- Input -->
+    <dimen name="input_radius">12dp</dimen>
+</resources>

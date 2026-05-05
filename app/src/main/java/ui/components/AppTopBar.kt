@@ -27,7 +27,8 @@ import ui.theme.Primary
 fun MainTopBar(
     onProfileClick: () -> Unit,
     onChatClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentColor: Color = Primary
 ) {
     Row(
         modifier = modifier
@@ -41,16 +42,16 @@ fun MainTopBar(
             Icon(
                 imageVector = Icons.Filled.PersonOutline,
                 contentDescription = "Профиль",
-                tint = Primary,
+                tint = contentColor,
                 modifier = Modifier.size(26.dp)
             )
         }
-        Text(text = "ДИАЛОГ", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Primary)
+        Text(text = "ДИАЛОГ", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = contentColor)
         IconButton(onClick = onChatClick, modifier = Modifier.size(40.dp)) {
             Icon(
                 imageVector = Icons.Filled.ChatBubbleOutline,
                 contentDescription = "Чат",
-                tint = Primary,
+                tint = contentColor,
                 modifier = Modifier.size(24.dp)
             )
         }

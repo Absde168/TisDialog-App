@@ -4,6 +4,8 @@ import data.model.ChatMessage
 import data.model.ConnectionHistory
 import data.model.LoginRequest
 import data.model.LoginResponse
+import data.model.RegisterRequest
+import data.model.RegisterResponse
 import data.model.PaymentHistory
 import data.model.SystemNotification
 import data.model.UpdateUserRequest
@@ -20,6 +22,9 @@ interface ApiService {
     // ─── Auth ─────────────────────────────────────────────────────────────────
     @POST("api/auth/login")
     suspend fun login(@Body request: LoginRequest): LoginResponse
+
+    @POST("api/auth/register")
+    suspend fun register(@Body request: RegisterRequest): RegisterResponse
 
     // ─── Users ────────────────────────────────────────────────────────────────
     @GET("api/users/profile")

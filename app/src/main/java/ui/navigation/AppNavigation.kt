@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ui.screens.auth.AuthScreen
+import ui.screens.auth.register.RegisterScreen
 import ui.screens.auth.balance.TopUpBalanceScreen
 import ui.screens.auth.chat.ChatSupportScreen
 import ui.screens.auth.history.PaymentHistoryScreen
@@ -48,6 +49,22 @@ fun AppNavigation() {
                     navController.navigate("main") {
                         popUpTo("auth") { inclusive = true }
                     }
+                },
+                onRegisterClick = {
+                    navController.navigate("register")
+                }
+            )
+        }
+
+        composable("register") {
+            RegisterScreen(
+                onRegisterSuccess = {
+                    navController.navigate("main") {
+                        popUpTo("auth") { inclusive = true }
+                    }
+                },
+                onBackToLogin = {
+                    navController.popBackStack()
                 }
             )
         }

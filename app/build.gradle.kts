@@ -19,7 +19,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // 🔑 BASE_URL для эмулятора (10.0.2.2 = localhost хоста)
-        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:5000/\"")
+        // Эмулятор: 10.0.2.2:5000  |  Реальный телефон: 192.168.0.6:5000
+        buildConfigField("String", "BASE_URL", "\"http://192.168.0.6:5000/\"")
     }
 
     buildTypes {

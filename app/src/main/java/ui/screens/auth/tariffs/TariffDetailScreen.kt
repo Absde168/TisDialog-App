@@ -1,6 +1,7 @@
 package ui.screens.auth.tariffs
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,14 +12,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ui.components.DetailTopBar
-import ui.theme.BackgroundLight
+import ui.components.AppBottomNav
+import ui.components.MainTopBar
 import ui.theme.Primary
 import ui.theme.TextSecondary
 
-// Простое статическое описание тарифов по имени
 private data class TariffDetails(
     val speed: String,
     val traffic: String,
@@ -27,11 +28,11 @@ private data class TariffDetails(
 )
 
 private fun getTariffDetails(name: String): TariffDetails = when (name) {
-    "СуперЛайт"     -> TariffDetails("до 100 Мбит/с", "Безлимитный", "500 ₽/мес",  "Идеально для повседневного использования")
-    "СуперСтандарт" -> TariffDetails("до 300 Мбит/с", "Безлимитный", "800 ₽/мес",  "Оптимальный выбор для семьи")
-    "СуперПро"      -> TariffDetails("до 500 Мбит/с", "Безлимитный", "1 200 ₽/мес","Для геймеров и стримеров")
-    "СуперМакс"     -> TariffDetails("до 1 Гбит/с",   "Безлимитный", "1 500 ₽/мес","Максимальная скорость без ограничений")
-    else            -> TariffDetails("до 100 Мбит/с", "Безлимитный", "500 ₽/мес",  "")
+    "СуперЛайт"     -> TariffDetails("до 100 Мбит/с", "Безлимитный", "500 руб./мес",  "Скорость 100 Мбит/с\nТехнология xPON до дома\nв квартиру FTTB")
+    "СуперСтандарт" -> TariffDetails("до 300 Мбит/с", "Безлимитный", "800 руб./мес",  "Скорость 300 Мбит/с\nТехнология xPON до дома\nв квартиру FTTB")
+    "СуперПро"      -> TariffDetails("до 500 Мбит/с", "Безлимитный", "1 200 руб./мес","Скорость 500 Мбит/с\nТехнология xPON до дома\nв квартиру FTTB")
+    "СуперМакс"     -> TariffDetails("до 1 Гбит/с",   "Безлимитный", "1 500 руб./мес","Скорость 1 Гбит/с\nТехнология xPON до дома\nв квартиру FTTB")
+    else            -> TariffDetails("до 100 Мбит/с", "Безлимитный", "500 руб./мес",  "Скорость 100 Мбит/с\nТехнология xPON до дома\nв квартиру FTTB")
 }
 
 @Composable
@@ -42,137 +43,125 @@ fun TariffDetailScreen(
 ) {
     val details = getTariffDetails(tariffName)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-    ) {
-        // ── Шапка ─────────────────────────────────────────────────────────────
-        DetailTopBar(onBackClick = onBackClick)
+    Column(modifier = Modifier.fillMaxSize()) {
 
-        Spacer(Modifier.height(16.dp))
-
-        // ── Карточка тарифа ───────────────────────────────────────────────────
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(3.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = tariffName,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Primary
-                )
-                Spacer(Modifier.height(4.dp))
-                if (details.description.isNotBlank()) {
-                    Text(
-                        text = details.description,
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Spacer(Modifier.height(20.dp))
-
-                TariffDetailRow("Скорость", details.speed)
-                Spacer(Modifier.height(10.dp))
-                TariffDetailRow("Трафик", details.traffic)
-                Spacer(Modifier.height(10.dp))
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Spacer(Modifier.height(14.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Стоимость",
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = details.price,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Primary
-                    )
-                }
-            }
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        // ── Что входит ────────────────────────────────────────────────────────
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(1.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = "Что входит в тариф",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(Modifier.height(12.dp))
-                IncludeItem("✓  Безлимитный интернет")
-                Spacer(Modifier.height(6.dp))
-                IncludeItem("✓  Техподдержка 24/7")
-                Spacer(Modifier.height(6.dp))
-                IncludeItem("✓  Личный кабинет")
-                Spacer(Modifier.height(6.dp))
-                IncludeItem("✓  Статистика использования")
-            }
-        }
-
-        Spacer(Modifier.weight(1f))
-        Spacer(Modifier.height(24.dp))
-
-        // ── Кнопка подключить ─────────────────────────────────────────────────
-        Button(
-            onClick = onConnectClick,
+        // ── Синяя шапка с детальной карточкой тарифа ─────────────────────────
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(26.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Primary)
+                .background(Primary)
         ) {
-            Text(
-                text = "Подключить тариф",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                MainTopBar(
+                    onProfileClick = {},
+                    onChatClick = {},
+                    contentColor = Color.White
+                )
+
+                Text(
+                    text = "Текущий тариф:",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                )
+
+                // Детальная карточка тарифа
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(0.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "\"$tariffName\"",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Primary,
+                            textAlign = TextAlign.Center
+                        )
+                        if (details.description.isNotBlank()) {
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = details.description,
+                                fontSize = 13.sp,
+                                color = TextSecondary,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 18.sp
+                            )
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = details.price,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+            }
         }
 
-        Spacer(Modifier.height(24.dp))
-    }
-}
+        // ── Прокручиваемый контент ────────────────────────────────────────────
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+        ) {
+            Spacer(Modifier.height(8.dp))
 
-@Composable
-private fun TariffDetailRow(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(text = label, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(text = value, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
-    }
-}
+            Text(
+                text = "Примечание к тарифу",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Primary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { }
+                    .padding(vertical = 16.dp)
+            )
 
-@Composable
-private fun IncludeItem(text: String) {
-    Text(text = text, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            Text(
+                text = "Заключить договор",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Primary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onConnectClick() }
+                    .padding(vertical = 16.dp)
+            )
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            Spacer(Modifier.height(12.dp))
+        }
+
+        // ── Нижняя навигация (фиксированная) ─────────────────────────────────
+        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
+            AppBottomNav(
+                activeTab = 1,
+                onMainClick = onBackClick,
+                onTariffsClick = onBackClick,
+                onServicesClick = {}
+            )
+        }
+    }
 }

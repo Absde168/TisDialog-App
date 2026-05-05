@@ -2,6 +2,7 @@ package data.repository
 
 import android.util.Base64
 import data.model.LoginRequest
+import data.model.RegisterRequest
 import data.network.ApiService
 import org.json.JSONObject
 import util.Result
@@ -17,6 +18,28 @@ class AuthRepository(
         return when (result) {
             is Result.Success -> {
                 val userId = decodeUserIdFromToken(result.data.token) ?: 0
+                tokenManager.saveToken(result.data.token, userId)
+                Result.Success(Unit)
+            }
+            is Result.Error -> result
+            is Result.Loading -> result
+        }
+    }
+
+    suspend fun register(
+        login: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        email: String,
+        phone: String
+    ): Result<Unit> {
+        val result = safeApiCall {
+            api.register(RegisterRequest(login, password, firstName, lastName, email, phone))
+        }
+        return when (result) {
+            is Result.Success -> {
+                val userId = decodeUserIdFromToken(result.data.token) ?: result.data.userId
                 tokenManager.saveToken(result.data.token, userId)
                 Result.Success(Unit)
             }

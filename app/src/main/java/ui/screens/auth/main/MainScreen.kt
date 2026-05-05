@@ -1,5 +1,6 @@
 package ui.screens.auth.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -18,10 +20,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import data.model.PaymentHistory
 import ui.components.AppBottomNav
 import ui.components.MainTopBar
-import ui.theme.BackgroundLight
 import ui.theme.ErrorRed
 import ui.theme.Primary
-import ui.theme.SuccessGreen
 import ui.theme.TextSecondary
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -39,112 +39,119 @@ fun MainScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var historyExpanded by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-    ) {
-        // ── Шапка ─────────────────────────────────────────────────────────────
-        MainTopBar(onProfileClick = onProfileClick, onChatClick = onChatClick)
+    Column(modifier = Modifier.fillMaxSize()) {
 
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 80.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = Primary)
-            }
-        } else {
-            Spacer(Modifier.height(8.dp))
-
-            // ── Статус подключения ─────────────────────────────────────────────
-            Text(
-                text = "Подключение: Активно",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-
-            // ── Карточка баланса ───────────────────────────────────────────────
-            BalanceCard(
-                balance = uiState.balance,
-                onTopUpClick = onTopUpClick
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            // ── Карточка информации ────────────────────────────────────────────
-            InfoCard(uiState)
-
-            Spacer(Modifier.height(12.dp))
-
-            // ── История платежей (сворачиваемая) ──────────────────────────────
-            PaymentHistoryCard(
-                payments = uiState.recentPayments,
-                expanded = historyExpanded,
-                onToggle = { historyExpanded = !historyExpanded },
-                onViewAll = onHistoryClick,
-                onRefresh = { viewModel.loadData() }
-            )
-        }
-
-        uiState.error?.let {
-            Spacer(Modifier.height(8.dp))
-            Text(text = it, color = ErrorRed, fontSize = 12.sp)
-        }
-
-        Spacer(Modifier.weight(1f))
-        Spacer(Modifier.height(12.dp))
-
-        // ── Нижняя навигация ───────────────────────────────────────────────────
-        AppBottomNav(
-            activeTab = 0,
-            onMainClick = { },
-            onTariffsClick = onTariffsClick,
-            onServicesClick = onServicesClick
-        )
-        Spacer(Modifier.height(16.dp))
-    }
-}
-
-// ── Карточка Баланса ──────────────────────────────────────────────────────────
-@Composable
-private fun BalanceCard(balance: Double, onTopUpClick: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
-    ) {
-        Row(
+        // ── Синяя шапка (фиксированная) ───────────────────────────────────────
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .background(Primary)
         ) {
-            Column {
-                Text(text = "Баланс", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = "%.2f ₽".format(balance),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (balance >= 0) MaterialTheme.colorScheme.onSurface else ErrorRed
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                MainTopBar(
+                    onProfileClick = onProfileClick,
+                    onChatClick = onChatClick,
+                    contentColor = Color.White
                 )
+
+                // Статус подключения
+                Text(
+                    text = "Подключение: Активно",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                // Баланс + кнопка Оплатить
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "%.2f ₽".format(uiState.balance),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Button(
+                        onClick = onTopUpClick,
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = Primary
+                        ),
+                        modifier = Modifier.height(36.dp),
+                        contentPadding = PaddingValues(horizontal = 20.dp)
+                    ) {
+                        Text(
+                            text = "Оплатить",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Primary
+                        )
+                    }
+                }
             }
-            Button(
-                onClick = onTopUpClick,
-                shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                modifier = Modifier.height(38.dp)
-            ) {
-                Text("Оплатить", fontSize = 13.sp, fontWeight = FontWeight.Medium)
+        }
+
+        // ── Прокручиваемый контент ────────────────────────────────────────────
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+        ) {
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 80.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Primary)
+                }
+            } else {
+                Spacer(Modifier.height(16.dp))
+
+                // ── Карточка информации ────────────────────────────────────────
+                InfoCard(uiState)
+
+                Spacer(Modifier.height(12.dp))
+
+                // ── История платежей ───────────────────────────────────────────
+                PaymentHistoryCard(
+                    payments = uiState.recentPayments,
+                    expanded = historyExpanded,
+                    onToggle = { historyExpanded = !historyExpanded },
+                    onViewAll = onHistoryClick
+                )
+
+                Spacer(Modifier.height(12.dp))
             }
+
+            uiState.error?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(text = it, color = ErrorRed, fontSize = 12.sp)
+            }
+        }
+
+        // ── Нижняя навигация (фиксированная) ─────────────────────────────────
+        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
+            AppBottomNav(
+                activeTab = 0,
+                onMainClick = { },
+                onTariffsClick = onTariffsClick,
+                onServicesClick = onServicesClick
+            )
         }
     }
 }
@@ -159,33 +166,53 @@ private fun InfoCard(uiState: MainUiState) {
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // Скорость подключения
             Text(
-                text = "Скорость подключения:",
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 8.dp)
+                text = "Скорость подключения",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Primary
             )
-            InfoRow("Загрузка:", "15 Мбит/с")
-            InfoRow("Отдача:", "5 Мбит/с")
-            Spacer(Modifier.height(8.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            Spacer(Modifier.height(8.dp))
-            InfoRow("Трафик:", uiState.dataUsedFormatted)
-            InfoRow("Лицевой счет:", uiState.user?.login ?: "—")
-        }
-    }
-}
+            Spacer(Modifier.height(4.dp))
+            Text(text = "Загрузка: 15 Мбит/с", fontSize = 13.sp, color = TextSecondary)
+            Text(text = "Отдача: 5 Мбит/с", fontSize = 13.sp, color = TextSecondary)
 
-@Composable
-private fun InfoRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 3.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(text = label, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
-        Text(text = value, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
+            Spacer(Modifier.height(14.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Spacer(Modifier.height(14.dp))
+
+            // Трафик | Лицевой счет
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Трафик",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = uiState.dataUsedFormatted,
+                        fontSize = 13.sp,
+                        color = TextSecondary
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Лицевой счет",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = uiState.user?.login ?: "—",
+                        fontSize = 13.sp,
+                        color = TextSecondary
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -195,20 +222,20 @@ private fun PaymentHistoryCard(
     payments: List<PaymentHistory>,
     expanded: Boolean,
     onToggle: () -> Unit,
-    onViewAll: () -> Unit,
-    onRefresh: () -> Unit
+    onViewAll: () -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onToggle() },
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // Заголовок
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onToggle() },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -219,8 +246,9 @@ private fun PaymentHistoryCard(
                     color = Primary
                 )
                 Text(
-                    text = if (expanded) "▼" else "▶",
-                    fontSize = 13.sp,
+                    text = if (expanded) "∨" else ">",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
                     color = Primary
                 )
             }
@@ -238,21 +266,13 @@ private fun PaymentHistoryCard(
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
                 } else {
-                    payments.forEach { p ->
+                    payments.forEachIndexed { index, p ->
                         PaymentRow(p)
-                        Spacer(Modifier.height(10.dp))
-                    }
-                    TextButton(
-                        onClick = onViewAll,
-                        modifier = Modifier.align(Alignment.End),
-                        contentPadding = PaddingValues(horizontal = 0.dp)
-                    ) {
-                        Text(
-                            text = "Вся история →",
-                            color = Primary,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium
-                        )
+                        if (index < payments.lastIndex) {
+                            Spacer(Modifier.height(8.dp))
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                            Spacer(Modifier.height(8.dp))
+                        }
                     }
                 }
             }
@@ -263,19 +283,23 @@ private fun PaymentHistoryCard(
 @Composable
 private fun PaymentRow(p: PaymentHistory) {
     val isPositive = p.amount >= 0
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(formatDate(p.paymentDate), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Primary)
-            Text(p.paymentMethod, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = if (isPositive) "+%.2f ₽".format(p.amount) else "%.2f ₽".format(p.amount),
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = if (isPositive) SuccessGreen else ErrorRed
+            text = formatDate(p.paymentDate),
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(
+            text = p.paymentMethod,
+            fontSize = 12.sp,
+            color = TextSecondary
+        )
+        Text(
+            text = "Сумма: ${if (isPositive) "+%.0f".format(p.amount) else "%.0f".format(p.amount)} руб.",
+            fontSize = 12.sp,
+            color = TextSecondary
         )
     }
 }

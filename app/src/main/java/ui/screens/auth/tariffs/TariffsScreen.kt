@@ -1,5 +1,6 @@
 package ui.screens.auth.tariffs
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,11 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ui.components.AppBottomNav
-import ui.components.DetailTopBar
-import ui.theme.BackgroundLight
+import ui.components.MainTopBar
 import ui.theme.Primary
 import ui.theme.TextSecondary
 
@@ -29,125 +30,134 @@ fun TariffsScreen(
 ) {
     var showTariffList by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-    ) {
-        // ── Шапка ─────────────────────────────────────────────────────────────
-        DetailTopBar(onBackClick = onBackClick)
+    Column(modifier = Modifier.fillMaxSize()) {
 
-        Spacer(Modifier.height(8.dp))
-
-        Text(
-            text = "Тарифы",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-        // ── Текущий тариф ─────────────────────────────────────────────────────
-        Text(
-            text = "Текущий тариф",
-            fontSize = 13.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(2.dp)
+        // ── Синяя шапка с текущим тарифом ─────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Primary)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "СуперЛайт 100",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Primary
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                MainTopBar(
+                    onProfileClick = {},
+                    onChatClick = {},
+                    contentColor = Color.White
                 )
-                Spacer(Modifier.height(4.dp))
+
                 Text(
-                    text = "500 ₽/мес",
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = "Скорость до 100 Мбит/с",
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(Modifier.height(12.dp))
-                Button(
-                    onClick = { },
+                    text = "Текущий тариф:",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(44.dp),
-                    shape = RoundedCornerShape(22.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Primary)
+                        .padding(bottom = 16.dp)
+                )
+
+                // Карточка текущего тарифа внутри синей шапки
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(0.dp)
                 ) {
-                    Text("Оплатить", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "\"СуперГига 100\"",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Primary,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = "500 руб./мес",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        Button(
+                            onClick = { },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp),
+                            shape = RoundedCornerShape(22.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Primary)
+                        ) {
+                            Text(
+                                text = "Оплатить",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
                 }
+
+                Spacer(Modifier.height(20.dp))
             }
         }
 
-        Spacer(Modifier.height(20.dp))
-
-        // ── Другие тарифы ─────────────────────────────────────────────────────
-        Row(
+        // ── Прокручиваемый контент ────────────────────────────────────────────
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .clickable { showTariffList = !showTariffList }
-                .padding(vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
         ) {
-            Text(
-                text = "Другие тарифы",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Text(
-                text = if (showTariffList) "▼" else "▶",
-                fontSize = 13.sp,
-                color = Primary
-            )
-        }
+            Spacer(Modifier.height(16.dp))
 
-        if (showTariffList) {
+            // ── Другие тарифы ─────────────────────────────────────────────────
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showTariffList = !showTariffList }
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Другие тарифы",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Primary
+                )
+                Text(
+                    text = if (showTariffList) "∨" else ">",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Primary
+                )
+            }
+
+            if (showTariffList) {
+                Spacer(Modifier.height(8.dp))
+                TariffItem("СуперЛайт", "100 Мбит", "500 руб./мес") { onTariffClick("СуперЛайт") }
+                TariffItem("СуперСтандарт", "300 Мбит", "800 руб./мес") { onTariffClick("СуперСтандарт") }
+                TariffItem("СуперПро", "500 Мбит", "1 200 руб./мес") { onTariffClick("СуперПро") }
+                TariffItem("СуперМакс", "1 Гбит", "1 500 руб./мес") { onTariffClick("СуперМакс") }
+            }
+
             Spacer(Modifier.height(12.dp))
-
-            TariffItem("СуперЛайт", "до 100 Мбит/с", "500 ₽/мес") { onTariffClick("СуперЛайт") }
-            Spacer(Modifier.height(8.dp))
-            TariffItem("СуперСтандарт", "до 300 Мбит/с", "800 ₽/мес") { onTariffClick("СуперСтандарт") }
-            Spacer(Modifier.height(8.dp))
-            TariffItem("СуперПро", "до 500 Мбит/с", "1 200 ₽/мес") { onTariffClick("СуперПро") }
-            Spacer(Modifier.height(8.dp))
-            TariffItem("СуперМакс", "до 1 Гбит/с", "1 500 ₽/мес") { onTariffClick("СуперМакс") }
         }
 
-        Spacer(Modifier.weight(1f))
-        Spacer(Modifier.height(12.dp))
-
-        // ── Нижняя навигация ─────────────────────────────────────────────────
-        AppBottomNav(
-            activeTab = 1,
-            onMainClick = onMainClick,
-            onTariffsClick = {},
-            onServicesClick = onServicesClick
-        )
-        Spacer(Modifier.height(16.dp))
+        // ── Нижняя навигация (фиксированная) ─────────────────────────────────
+        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
+            AppBottomNav(
+                activeTab = 1,
+                onMainClick = onMainClick,
+                onTariffsClick = {},
+                onServicesClick = onServicesClick
+            )
+        }
     }
 }
 
@@ -158,37 +168,46 @@ private fun TariffItem(
     price: String,
     onClick: () -> Unit
 ) {
-    Card(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(1.dp)
+            .padding(vertical = 12.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Text(
+            text = "\"$name\"",
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(
+            text = speed,
+            fontSize = 13.sp,
+            color = TextSecondary
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = price,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(Modifier.height(10.dp))
+        OutlinedButton(
+            onClick = onClick,
+            shape = RoundedCornerShape(20.dp),
+            border = BorderStroke(1.dp, Primary),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Primary),
+            contentPadding = PaddingValues(horizontal = 20.dp),
+            modifier = Modifier.height(34.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = name,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(text = speed, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
             Text(
-                text = price,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Primary
+                text = "Подробнее",
+                fontSize = 13.sp,
+                color = Primary,
+                fontWeight = FontWeight.Medium
             )
         }
     }
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 }

@@ -26,6 +26,7 @@ import ui.theme.TextSecondary
 @Composable
 fun AuthScreen(
     onLoginSuccess: () -> Unit,
+    onRegisterClick: () -> Unit,
     authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.factory())
 ) {
     var login by remember { mutableStateOf("") }
@@ -53,7 +54,7 @@ fun AuthScreen(
             text = "Авторизация",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = Primary,
             modifier = Modifier.padding(bottom = 40.dp)
         )
 
@@ -70,7 +71,7 @@ fun AuthScreen(
             )
         }
 
-        // ── Поле логин (underline стиль) ───────────────────────────────────────
+        // ── Поле логин (rounded outline стиль) ────────────────────────────────
         AuthTextField(
             value = login,
             onValueChange = {
@@ -85,7 +86,7 @@ fun AuthScreen(
             enabled = !uiState.isLoading
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // ── Поле пароль ────────────────────────────────────────────────────────
         AuthTextField(
@@ -138,7 +139,26 @@ fun AuthScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedButton(
+            onClick = onRegisterClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            enabled = !uiState.isLoading,
+            shape = RoundedCornerShape(26.dp),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Primary),
+            border = androidx.compose.foundation.BorderStroke(1.5.dp, Primary)
+        ) {
+            Text(
+                text = "Зарегистрироваться",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         TextButton(onClick = { }) {
             Text(
@@ -163,34 +183,26 @@ private fun AuthTextField(
     enabled: Boolean = true
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        // Label над полем
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            color = if (isError) ErrorRed else MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-        TextField(
+        OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            placeholder = {
-                Text(text = placeholder, fontSize = 14.sp, color = TextHint)
-            },
+            label = { Text(text = label, fontSize = 13.sp) },
+            placeholder = { Text(text = placeholder, fontSize = 14.sp, color = TextHint) },
             modifier = Modifier.fillMaxWidth(),
             isError = isError,
             visualTransformation = visualTransformation,
             enabled = enabled,
             singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor    = Color.Transparent,
-                unfocusedContainerColor  = Color.Transparent,
-                disabledContainerColor   = Color.Transparent,
-                errorContainerColor      = Color.Transparent,
-                focusedIndicatorColor    = Primary,
-                unfocusedIndicatorColor  = TextHint,
-                errorIndicatorColor      = ErrorRed,
-                focusedTextColor         = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor       = MaterialTheme.colorScheme.onSurface
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Primary,
+                unfocusedBorderColor = Color(0xFFDDE3EF),
+                errorBorderColor = ErrorRed,
+                focusedLabelColor = Primary,
+                unfocusedLabelColor = TextSecondary,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = Primary
             )
         )
         if (errorText != null) {

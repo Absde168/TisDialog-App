@@ -18,9 +18,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // 🔑 BASE_URL для эмулятора (10.0.2.2 = localhost хоста)
-        // Эмулятор: 10.0.2.2:5000  |  Реальный телефон: 192.168.0.6:5000
-        buildConfigField("String", "BASE_URL", "\"http://192.168.0.6:5000/\"")
+        // Debug: localhost (эмулятор / реальный телефон в локалке)
+        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:5245/\"")
     }
 
     buildTypes {
@@ -30,6 +29,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Release → облачный сервер Render
+            buildConfigField("String", "BASE_URL", "\"https://tisdialog-api.onrender.com/\"")
+        }
+        debug {
+            // Debug → localhost (эмулятор или телефон в локальной сети)
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:5245/\"")
         }
     }
 

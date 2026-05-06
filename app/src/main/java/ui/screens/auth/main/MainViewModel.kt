@@ -10,9 +10,11 @@ import data.repository.ConnectionRepository
 import data.repository.PaymentRepository
 import data.repository.UserRepository
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import util.Result
 
@@ -46,6 +48,9 @@ class MainViewModel(
     private val _uiState = MutableStateFlow(MainUiState(isLoading = true))
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
+    private val _sessionExpired = Channel<Unit>(Channel.BUFFERED)
+    val sessionExpired = _sessionExpired.receiveAsFlow()
+
     init {
         loadData()
     }
@@ -62,8 +67,14 @@ class MainViewModel(
             val paymentsResult = paymentsDeferred.await()
             val connectionResult = connectionDeferred.await()
 
+            // Если профиль не найден (401/404) — очищаем токен и выходим
+            if (userResult is Result.Error && (userResult.code == 401 || userResult.code == 404)) {
+                TisDialogApp.instance.tokenManager.clearToken()
+                _sessionExpired.send(Unit)
+                return@launch
+            }
+
             val payments = (paymentsResult as? Result.Success)?.data ?: emptyList()
-            // Balance = sum of all payments (positive = deposit, negative = charge)
             val balance = payments.sumOf { it.amount }
 
             _uiState.value = MainUiState(

@@ -77,7 +77,12 @@ fun AppNavigation() {
                 onHistoryClick  = { navController.navigate("history") },
                 onTariffsClick  = { navController.navigate("tariffs") },
                 onServicesClick = { navController.navigate("services") },
-                onTopUpClick    = { navController.navigate("topup") }
+                onTopUpClick    = { navController.navigate("topup") },
+                onSessionExpired = {
+                    navController.navigate("auth") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             )
         }
 

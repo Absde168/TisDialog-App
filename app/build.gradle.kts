@@ -33,8 +33,8 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://tisdialog-api.onrender.com/\"")
         }
         debug {
-            // Debug → localhost (эмулятор или телефон в локальной сети)
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:5245/\"")
+            // Debug → облачный сервер Render
+            buildConfigField("String", "BASE_URL", "\"https://tisdialog-api.onrender.com/\"")
         }
     }
 

@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.flow.collectLatest
 import data.model.PaymentHistory
 import ui.components.AppBottomNav
 import ui.components.MainTopBar
@@ -34,10 +35,16 @@ fun MainScreen(
     onTariffsClick: () -> Unit,
     onServicesClick: () -> Unit,
     onTopUpClick: () -> Unit,
+    onSessionExpired: () -> Unit = {},
     viewModel: MainViewModel = viewModel(factory = MainViewModel.factory())
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var historyExpanded by remember { mutableStateOf(false) }
+
+    // Автовыход если сессия истекла (токен недействителен / пользователь не найден)
+    LaunchedEffect(Unit) {
+        viewModel.sessionExpired.collectLatest { onSessionExpired() }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
 

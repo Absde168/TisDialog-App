@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ui.screens.auth.AuthScreen
 import ui.screens.auth.register.RegisterScreen
+import ui.screens.auth.balance.OtherBanksScreen
 import ui.screens.auth.balance.TopUpBalanceScreen
 import ui.screens.auth.chat.ChatSupportScreen
 import ui.screens.auth.history.PaymentHistoryScreen
@@ -93,6 +94,7 @@ fun AppNavigation() {
                         popUpTo(0) { inclusive = true }
                     }
                 },
+                onChatClick     = { navController.navigate("chat") },
                 onTariffsClick  = { navController.navigate("tariffs") },
                 onServicesClick = { navController.navigate("services") }
             )
@@ -128,7 +130,10 @@ fun AppNavigation() {
                         popUpTo("main") { inclusive = false }
                     }
                 },
-                onServicesClick = { navController.navigate("services") }
+                onServicesClick = { navController.navigate("services") },
+                onProfileClick = { navController.navigate("profile") },
+                onChatClick = { navController.navigate("chat") },
+                onPayClick = { navController.navigate("topup") }
             )
         }
 
@@ -153,12 +158,23 @@ fun AppNavigation() {
                         popUpTo("main") { inclusive = false }
                     }
                 },
-                onTariffsClick = { navController.navigate("tariffs") }
+                onTariffsClick = { navController.navigate("tariffs") },
+                onProfileClick = { navController.navigate("profile") },
+                onChatClick = { navController.navigate("chat") }
             )
         }
 
         composable("chat") {
-            ChatSupportScreen(onBackClick = { navController.popBackStack() })
+            ChatSupportScreen(
+                onProfileClick = { navController.navigate("profile") },
+                onMainClick = {
+                    navController.navigate("main") {
+                        popUpTo("main") { inclusive = false }
+                    }
+                },
+                onTariffsClick = { navController.navigate("tariffs") },
+                onServicesClick = { navController.navigate("services") }
+            )
         }
 
         composable("history") {
@@ -166,7 +182,14 @@ fun AppNavigation() {
         }
 
         composable("topup") {
-            TopUpBalanceScreen(onBackClick = { navController.popBackStack() })
+            TopUpBalanceScreen(
+                onBackClick = { navController.popBackStack() },
+                onOtherBanksClick = { navController.navigate("other_banks") }
+            )
+        }
+
+        composable("other_banks") {
+            OtherBanksScreen(onBackClick = { navController.popBackStack() })
         }
     }
 }

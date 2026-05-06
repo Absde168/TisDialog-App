@@ -26,7 +26,10 @@ fun TariffsScreen(
     onBackClick: () -> Unit,
     onTariffClick: (String) -> Unit,
     onMainClick: () -> Unit = onBackClick,
-    onServicesClick: () -> Unit = {}
+    onServicesClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
+    onChatClick: () -> Unit = {},
+    onPayClick: () -> Unit = {}
 ) {
     var showTariffList by remember { mutableStateOf(false) }
 
@@ -40,8 +43,8 @@ fun TariffsScreen(
         ) {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 MainTopBar(
-                    onProfileClick = {},
-                    onChatClick = {},
+                    onProfileClick = onProfileClick,
+                    onChatClick = onChatClick,
                     contentColor = Color.White
                 )
 
@@ -86,7 +89,7 @@ fun TariffsScreen(
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(
-                            onClick = { },
+                            onClick = onPayClick,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(44.dp),

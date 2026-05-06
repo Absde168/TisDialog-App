@@ -5,7 +5,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,14 +21,21 @@ import ui.theme.Primary
 fun ServicesScreen(
     onBackClick: () -> Unit,
     onMainClick: () -> Unit = onBackClick,
-    onTariffsClick: () -> Unit = {}
+    onTariffsClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
+    onChatClick: () -> Unit = {}
 ) {
+    var vpnActive by remember { mutableStateOf(false) }
+    var antivirusActive by remember { mutableStateOf(false) }
+    var parentalActive by remember { mutableStateOf(true) }
+    var staticIpActive by remember { mutableStateOf(false) }
+
     Column(modifier = Modifier.fillMaxSize()) {
 
         // ── Шапка ─────────────────────────────────────────────────────────────
         MainTopBar(
-            onProfileClick = {},
-            onChatClick = {}
+            onProfileClick = onProfileClick,
+            onChatClick = onChatClick
         )
 
         // ── Прокручиваемый контент ────────────────────────────────────────────
@@ -51,32 +58,32 @@ fun ServicesScreen(
             ServiceCard(
                 name = "VPN",
                 description = "Защита вашего интернета",
-                isActive = false,
-                onConnect = {}
+                isActive = vpnActive,
+                onToggle = { vpnActive = !vpnActive }
             )
             Spacer(Modifier.height(12.dp))
 
             ServiceCard(
                 name = "Антивирус",
                 description = "Защита от вирусов",
-                isActive = false,
-                onConnect = {}
+                isActive = antivirusActive,
+                onToggle = { antivirusActive = !antivirusActive }
             )
             Spacer(Modifier.height(12.dp))
 
             ServiceCard(
                 name = "Родительский контроль",
                 description = "Безопасность детей в сети",
-                isActive = true,
-                onConnect = {}
+                isActive = parentalActive,
+                onToggle = { parentalActive = !parentalActive }
             )
             Spacer(Modifier.height(12.dp))
 
             ServiceCard(
                 name = "Статический IP",
                 description = "Постоянный адрес в сети",
-                isActive = false,
-                onConnect = {}
+                isActive = staticIpActive,
+                onToggle = { staticIpActive = !staticIpActive }
             )
 
             Spacer(Modifier.height(12.dp))
@@ -99,7 +106,7 @@ private fun ServiceCard(
     name: String,
     description: String,
     isActive: Boolean,
-    onConnect: () -> Unit
+    onToggle: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -129,40 +136,21 @@ private fun ServiceCard(
             )
             Spacer(Modifier.height(16.dp))
 
-            if (isActive) {
-                OutlinedButton(
-                    onClick = {},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(38.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-                ) {
-                    Text(
-                        text = "Активно",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.White
-                    )
-                }
-            } else {
-                OutlinedButton(
-                    onClick = onConnect,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(38.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-                ) {
-                    Text(
-                        text = "Подключить",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.White
-                    )
-                }
+            OutlinedButton(
+                onClick = onToggle,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(38.dp),
+                shape = RoundedCornerShape(20.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+            ) {
+                Text(
+                    text = if (isActive) "Отключить" else "Подключить",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White
+                )
             }
         }
     }

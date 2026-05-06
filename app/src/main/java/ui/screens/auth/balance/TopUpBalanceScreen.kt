@@ -1,5 +1,6 @@
 package ui.screens.auth.balance
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,22 +11,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tisdialogfirst.R
 import ui.components.DetailTopBar
-import ui.theme.BackgroundLight
 import ui.theme.ErrorRed
 import ui.theme.Primary
 import ui.theme.TextHint
-import ui.theme.TextSecondary
 
 @Composable
 fun TopUpBalanceScreen(
     onBackClick: () -> Unit,
+    onOtherBanksClick: () -> Unit = {},
     viewModel: TopUpViewModel = viewModel(factory = TopUpViewModel.factory())
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -108,30 +111,57 @@ fun TopUpBalanceScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            PaymentMethodButton(
-                text = "Карта",
-                icon = "💳",
+            // ── Карта МИР ─────────────────────────────────────────────────────
+            PaymentMethodCard(
+                label = "Карта",
                 selected = selectedMethod == "card",
                 enabled = !uiState.isLoading,
                 modifier = Modifier.weight(1f),
                 onClick = { selectedMethod = "card" }
-            )
-            PaymentMethodButton(
-                text = "СБП",
-                icon = "⚡",
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.mir_logo),
+                    contentDescription = "Мир",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .height(28.dp)
+                        .widthIn(max = 64.dp)
+                )
+            }
+
+            // ── СБП ───────────────────────────────────────────────────────────
+            PaymentMethodCard(
+                label = "СБП",
                 selected = selectedMethod == "sbp",
                 enabled = !uiState.isLoading,
                 modifier = Modifier.weight(1f),
                 onClick = { selectedMethod = "sbp" }
-            )
-            PaymentMethodButton(
-                text = "Счёт",
-                icon = "🏦",
-                selected = selectedMethod == "account",
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.sbp_logo),
+                    contentDescription = "СБП",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .height(28.dp)
+                        .widthIn(max = 64.dp)
+                )
+            }
+
+            // ── Другой банк ───────────────────────────────────────────────────
+            PaymentMethodCard(
+                label = "Добавить",
+                selected = false,
                 enabled = !uiState.isLoading,
                 modifier = Modifier.weight(1f),
-                onClick = { selectedMethod = "account" }
-            )
+                onClick = onOtherBanksClick
+            ) {
+                Text(
+                    text = "+",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Light,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
 
         Spacer(Modifier.weight(1f))
@@ -147,7 +177,7 @@ fun TopUpBalanceScreen(
                 containerColor = Primary,
                 disabledContainerColor = Primary.copy(alpha = 0.5f)
             ),
-            enabled = amount.isNotBlank() && !uiState.isLoading
+            enabled = amount.isNotBlank() && !uiState.isLoading && selectedMethod != ""
         ) {
             if (uiState.isLoading) {
                 CircularProgressIndicator(
@@ -169,36 +199,40 @@ fun TopUpBalanceScreen(
 }
 
 @Composable
-private fun PaymentMethodButton(
-    text: String,
-    icon: String,
+private fun PaymentMethodCard(
+    label: String,
     selected: Boolean,
     enabled: Boolean,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     Card(
         modifier = modifier
-            .height(64.dp)
+            .height(72.dp)
             .clickable(enabled = enabled) { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (selected) Primary else MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(if (selected) 0.dp else 1.dp),
-        border = if (!selected) androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                 else null
+        border = if (!selected) androidx.compose.foundation.BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outlineVariant
+        ) else null
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = icon, fontSize = 18.sp)
-            Spacer(Modifier.height(2.dp))
+            content()
+            Spacer(Modifier.height(4.dp))
             Text(
-                text = text,
-                fontSize = 13.sp,
+                text = label,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface
             )

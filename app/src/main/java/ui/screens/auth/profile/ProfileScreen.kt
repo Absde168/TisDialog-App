@@ -1,10 +1,9 @@
 package ui.screens.auth.profile
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -20,8 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ui.components.AppBottomNav
-import ui.components.DetailTopBar
-import ui.theme.BackgroundLight
+import ui.components.MainTopBar
 import ui.theme.ErrorRed
 import ui.theme.Primary
 import ui.theme.TextSecondary
@@ -35,6 +33,7 @@ fun ProfileScreen(
     onNotificationsClick: () -> Unit,
     onHelpClick: () -> Unit,
     onLogoutClick: () -> Unit,
+    onChatClick: () -> Unit = {},
     onTariffsClick: () -> Unit = {},
     onServicesClick: () -> Unit = {},
     viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.factory())
@@ -47,170 +46,132 @@ fun ProfileScreen(
     }
 
     if (showLogoutDialog) {
-        AlertDialog(
-            onDismissRequest = { showLogoutDialog = false },
-            shape = RoundedCornerShape(16.dp),
-            title = {
-                Text(
-                    text = "Выход из аккаунта",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    text = "Вы уверены, что хотите выйти?",
-                    fontSize = 14.sp
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { showLogoutDialog = false; viewModel.logout() }) {
-                    Text("Выйти", color = ErrorRed, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showLogoutDialog = false }) {
-                    Text("Отмена", color = Primary, fontSize = 14.sp)
-                }
-            }
+        LogoutConfirmDialog(
+            onConfirm = { showLogoutDialog = false; viewModel.logout() },
+            onDismiss = { showLogoutDialog = false }
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
+
         // ── Шапка ─────────────────────────────────────────────────────────────
-        DetailTopBar(onBackClick = onBackClick)
+        MainTopBar(
+            onProfileClick = {},
+            onChatClick = onChatClick
+        )
 
-        Spacer(Modifier.height(16.dp))
-
-        // ── Карточка пользователя ─────────────────────────────────────────────
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(2.dp)
+        // ── Прокручиваемый контент ────────────────────────────────────────────
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (uiState.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .align(Alignment.CenterVertically),
-                        color = Primary,
-                        strokeWidth = 3.dp
-                    )
-                } else {
-                    // Аватар с инициалами
-                    val initials = uiState.user?.let { u ->
-                        val f = u.firstName?.firstOrNull()?.uppercaseChar()?.toString() ?: ""
-                        val l = u.lastName?.firstOrNull()?.uppercaseChar()?.toString() ?: ""
-                        (f + l).ifBlank { u.login.take(2).uppercase() }
-                    } ?: "?"
+            Spacer(Modifier.height(8.dp))
 
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .background(Primary, CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
+            // ── Тёмно-синяя карточка пользователя ────────────────────────────
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Primary),
+                elevation = CardDefaults.cardElevation(0.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                ) {
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .align(Alignment.CenterHorizontally),
+                            color = Color.White,
+                            strokeWidth = 3.dp
+                        )
+                    } else {
                         Text(
-                            text = initials,
-                            fontSize = 20.sp,
+                            text = uiState.user?.fullName ?: "—",
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
-                    }
-
-                    Spacer(Modifier.width(16.dp))
-
-                    Column {
+                        Spacer(Modifier.height(6.dp))
                         Text(
-                            text = uiState.user?.fullName ?: "—",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = uiState.user?.login ?: "—",
+                            text = "№ ЛС: ${uiState.user?.login ?: "—"}",
                             fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = Color.White.copy(alpha = 0.9f)
                         )
                         if (!uiState.user?.phone.isNullOrBlank()) {
-                            Spacer(Modifier.height(2.dp))
+                            Spacer(Modifier.height(3.dp))
                             Text(
-                                text = uiState.user?.phone ?: "",
+                                text = "Телефон: ${uiState.user?.phone}",
                                 fontSize = 13.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = Color.White.copy(alpha = 0.9f)
+                            )
+                        }
+                        if (!uiState.user?.email.isNullOrBlank()) {
+                            Spacer(Modifier.height(3.dp))
+                            Text(
+                                text = "Email: ${uiState.user?.email}",
+                                fontSize = 13.sp,
+                                color = Color.White.copy(alpha = 0.9f)
                             )
                         }
                     }
                 }
             }
+
+            uiState.error?.let {
+                Spacer(Modifier.height(6.dp))
+                Text(text = it, color = ErrorRed, fontSize = 12.sp)
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            // ── Плоские пункты меню с разделителями ──────────────────────────
+            ProfileMenuItem(title = "Мои Контакты", onClick = onContactsClick)
+            ProfileMenuItem(title = "Обратиться в поддержку", onClick = onSupportClick)
+            ProfileMenuItem(
+                title = "Документы",
+                subtitle = "Договор, акты и т.п",
+                onClick = onDocumentsClick
+            )
+            ProfileMenuItem(title = "Настройка уведомлений", onClick = onNotificationsClick)
+            ProfileMenuItem(title = "Помощь / FAQ", onClick = onHelpClick)
+
+            Spacer(Modifier.height(28.dp))
+
+            // ── Кнопка выхода ─────────────────────────────────────────────────
+            OutlinedButton(
+                onClick = { showLogoutDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(26.dp),
+                border = BorderStroke(1.5.dp, Primary),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Primary)
+            ) {
+                Text(
+                    text = "Выйти из аккаунта",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Primary
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
         }
 
-        uiState.error?.let {
-            Spacer(Modifier.height(6.dp))
-            Text(text = it, color = ErrorRed, fontSize = 12.sp)
-        }
-
-        Spacer(Modifier.height(20.dp))
-
-        // ── Меню профиля ─────────────────────────────────────────────────────
-        ProfileMenuItem(title = "Мои контакты", onClick = onContactsClick)
-        Spacer(Modifier.height(8.dp))
-        ProfileMenuItem(title = "Обратиться в поддержку", onClick = onSupportClick)
-        Spacer(Modifier.height(8.dp))
-        ProfileMenuItem(
-            title = "Документы",
-            subtitle = "Договор, акты и т.п.",
-            onClick = onDocumentsClick
-        )
-        Spacer(Modifier.height(8.dp))
-        ProfileMenuItem(title = "Настройка уведомлений", onClick = onNotificationsClick)
-        Spacer(Modifier.height(8.dp))
-        ProfileMenuItem(title = "Помощь / FAQ", onClick = onHelpClick)
-
-        Spacer(Modifier.height(24.dp))
-
-        // ── Кнопка выхода ────────────────────────────────────────────────────
-        OutlinedButton(
-            onClick = { showLogoutDialog = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(26.dp),
-            border = androidx.compose.foundation.BorderStroke(1.5.dp, ErrorRed),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = ErrorRed)
-        ) {
-            Text(
-                text = "Выйти из аккаунта",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
+        // ── Нижняя навигация (фиксированная) ─────────────────────────────────
+        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)) {
+            AppBottomNav(
+                activeTab = -1,
+                onMainClick = onBackClick,
+                onTariffsClick = onTariffsClick,
+                onServicesClick = onServicesClick
             )
         }
-
-        Spacer(Modifier.weight(1f))
-        Spacer(Modifier.height(12.dp))
-
-        // ── Нижняя навигация ─────────────────────────────────────────────────
-        AppBottomNav(
-            activeTab = -1,
-            onMainClick = onBackClick,
-            onTariffsClick = onTariffsClick,
-            onServicesClick = onServicesClick
-        )
-        Spacer(Modifier.height(16.dp))
     }
 }
 
@@ -220,18 +181,12 @@ private fun ProfileMenuItem(
     subtitle: String? = null,
     onClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(1.dp)
-    ) {
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .clickable { onClick() }
+                .padding(vertical = 14.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -244,7 +199,11 @@ private fun ProfileMenuItem(
                 )
                 if (subtitle != null) {
                     Spacer(Modifier.height(2.dp))
-                    Text(text = subtitle, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        text = subtitle,
+                        fontSize = 12.sp,
+                        color = TextSecondary
+                    )
                 }
             }
             Icon(
@@ -254,5 +213,6 @@ private fun ProfileMenuItem(
                 modifier = Modifier.size(20.dp)
             )
         }
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 }

@@ -1,5 +1,6 @@
 package ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,12 +18,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tisdialogfirst.R
 import ui.theme.Primary
 
-/** Главная шапка: аватар | ДИАЛОГ | чат */
+/**
+ * Главная шапка: профиль | Лого | чат
+ * Синий фон  → белый логотип (без фильтра)
+ * Белый фон  → синий логотип (ColorFilter.tint Primary)
+ */
 @Composable
 fun MainTopBar(
     onProfileClick: () -> Unit,
@@ -30,6 +39,9 @@ fun MainTopBar(
     modifier: Modifier = Modifier,
     contentColor: Color = Primary
 ) {
+    val onDarkBg = contentColor == Color.White
+    val logoTint = if (onDarkBg) ColorFilter.tint(Color.White) else ColorFilter.tint(Primary)
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -46,7 +58,17 @@ fun MainTopBar(
                 modifier = Modifier.size(26.dp)
             )
         }
-        Text(text = "ДИАЛОГ", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = contentColor)
+
+        Image(
+            painter = painterResource(id = R.drawable.dialog_logo),
+            contentDescription = "ДИАЛОГ",
+            contentScale = ContentScale.Fit,
+            colorFilter = logoTint,
+            modifier = Modifier
+                .height(36.dp)
+                .widthIn(max = 130.dp)
+        )
+
         IconButton(onClick = onChatClick, modifier = Modifier.size(40.dp)) {
             Icon(
                 imageVector = Icons.Filled.ChatBubbleOutline,
@@ -58,7 +80,10 @@ fun MainTopBar(
     }
 }
 
-/** Шапка для вложенных экранов: ← Назад | Заголовок | пустышка */
+/**
+ * Шапка вложенных экранов: ← Назад | Лого синий | отступ
+ * Всегда на белом фоне → логотип синий
+ */
 @Composable
 fun DetailTopBar(
     onBackClick: () -> Unit,
@@ -88,13 +113,32 @@ fun DetailTopBar(
             Spacer(Modifier.width(2.dp))
             Text(text = "Назад", fontSize = 14.sp, color = Primary)
         }
-        Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Primary)
+
+        if (title == "ДИАЛОГ") {
+            Image(
+                painter = painterResource(id = R.drawable.dialog_logo),
+                contentDescription = "ДИАЛОГ",
+                contentScale = ContentScale.Fit,
+                colorFilter = ColorFilter.tint(Primary),
+                modifier = Modifier
+                    .height(32.dp)
+                    .widthIn(max = 120.dp)
+            )
+        } else {
+            Text(
+                text = title,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Primary
+            )
+        }
+
         Spacer(Modifier.width(72.dp))
     }
 }
 
 /**
- * Нижняя навигация. activeTab: 0=Главная, 1=Тарифы, 2=Услуги
+ * Нижняя навигация. activeTab: 0=Главная, 1=Тарифы, 2=Услуги, -1=нет активной
  */
 @Composable
 fun AppBottomNav(
@@ -117,12 +161,13 @@ fun AppBottomNav(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         labels.forEachIndexed { i, label ->
+            val isActive = i == activeTab
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
                     .then(
-                        if (i == activeTab)
+                        if (isActive)
                             Modifier
                                 .padding(4.dp)
                                 .clip(RoundedCornerShape(24.dp))
@@ -130,14 +175,14 @@ fun AppBottomNav(
                         else
                             Modifier.clickable { clicks[i]() }
                     )
-                    .then(if (i == activeTab) Modifier.clickable { clicks[i]() } else Modifier),
+                    .then(if (isActive) Modifier.clickable { clicks[i]() } else Modifier),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = label,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = if (i == activeTab) Primary else Color.White
+                    color = if (isActive) Primary else Color.White
                 )
             }
         }

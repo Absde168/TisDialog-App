@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tisdialogfirst.TisDialogApp
 import data.model.ChatMessage
 import data.repository.ChatRepository
+import data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,25 +17,44 @@ data class ChatUiState(
     val isLoading: Boolean = false,
     val messages: List<ChatMessage> = emptyList(),
     val isSending: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val userName: String = ""
 )
 
-class ChatViewModel(private val chatRepository: ChatRepository) : ViewModel() {
+class ChatViewModel(
+    private val chatRepository: ChatRepository,
+    private val userRepository: UserRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState(isLoading = true))
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
 
     init {
         loadMessages()
+        loadUserName()
+    }
+
+    private fun loadUserName() {
+        viewModelScope.launch {
+            when (val result = userRepository.getProfile()) {
+                is Result.Success -> _uiState.value = _uiState.value.copy(
+                    userName = result.data.firstName
+                )
+                else -> Unit
+            }
+        }
     }
 
     private fun loadMessages() {
         viewModelScope.launch {
             when (val result = chatRepository.getMessages()) {
-                is Result.Success -> _uiState.value = ChatUiState(messages = result.data)
-                is Result.Error -> _uiState.value = ChatUiState(
-                    messages = defaultWelcomeMessages(),
-                    error = null
+                is Result.Success -> _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    messages = result.data
+                )
+                is Result.Error -> _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    messages = emptyList()
                 )
                 is Result.Loading -> Unit
             }
@@ -51,7 +71,6 @@ class ChatViewModel(private val chatRepository: ChatRepository) : ViewModel() {
                     _uiState.value = _uiState.value.copy(messages = updated, isSending = false)
                 }
                 is Result.Error -> {
-                    // Optimistically add message locally even if API fails
                     val local = ChatMessage(
                         userId = 0,
                         content = text,
@@ -69,15 +88,14 @@ class ChatViewModel(private val chatRepository: ChatRepository) : ViewModel() {
         }
     }
 
-    private fun defaultWelcomeMessages() = listOf(
-        ChatMessage(userId = 0, content = "Здравствуйте! Чем могу помочь?", senderType = "Support", timestamp = "")
-    )
-
     companion object {
         fun factory() = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return ChatViewModel(TisDialogApp.instance.chatRepository) as T
+                return ChatViewModel(
+                    TisDialogApp.instance.chatRepository,
+                    TisDialogApp.instance.userRepository
+                ) as T
             }
         }
     }

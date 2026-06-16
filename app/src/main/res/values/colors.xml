@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand -->
+    <color name="primary_blue">#214280</color>
+    <color name="primary_dark">#172E5C</color>
+
+    <!-- Backgrounds -->
+    <color name="background_light">#FAFAFA</color>
+    <color name="surface_white">#FFFFFF</color>
+    <color name="dark_bg">#060606</color>
+
+    <!-- Text -->
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#7E7E7E</color>
+    <color name="text_hint">#A8A8A8</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- Semantic -->
+    <color name="error_red">#FF3D3D</color>
+    <color name="success_green">#2E7D32</color>
+</resources>
